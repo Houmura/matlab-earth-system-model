@@ -14,11 +14,13 @@ for i=1:p
     vorticity = zeros(size(u_save(:,:,1)));
     vorticity(2:end-1,2:end-1) = (u_save(2:end-1,1:end-2,i)-u_save(2:end-1,3:end,i)) ...
         + (v_save(3:end,2:end-1,i)-v_save(1:end-2,2:end-1,i));
-    m_proj('robinson','long',[-180 180],'lat',[-90 90]);
+    m_proj('stereographic','lat',90,'lon',0,'radius',90)
     hold off;
     switch plot1
         case 'h'
             F1=h_save([91:180 1:90],:,i); 
+        case 'vort'
+            F1=vorticity([181:360 1:180],:);
         otherwise
             disp(['error ']);
             return;
