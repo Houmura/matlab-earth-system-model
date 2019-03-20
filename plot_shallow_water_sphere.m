@@ -11,12 +11,13 @@ warning off;
 lon=length(phi);
 phi2=[phi(lon/2+1:lon)-360.*pi./180 phi(1:lon/2)];
 PHI2=[PHI(lon/2+1:lon,:)-360.*pi./180; PHI(1:lon/2,:)];
-for i=480:p
+for i=1:p
     vorticity = zeros(size(u_save(:,:,1)));
     vorticity(2:end-1,2:end-1) = (u_save(2:end-1,1:end-2,i)-u_save(2:end-1,3:end,i)) ...
         + (v_save(3:end,2:end-1,i)-v_save(1:end-2,2:end-1,i));
-%     m_proj('robinson','long',[-180 180],'lat',[-90 90]);
-    m_proj('ortho','long',180,'lat',80);
+%    m_proj('robinson','long',[-180 180],'lat',[-90 90]);
+    m_proj('stereographic','lat',90,'lon',0,'radius',25)
+%    m_proj('ortho','long',180,'lat',80);
     hold off;
     switch plot1
         case 'h'
