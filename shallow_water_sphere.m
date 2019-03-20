@@ -46,10 +46,11 @@ dtheta=0.2.*pi./180;  % the north-south (latitude coordinate)
 dphi=1.*pi./180;    % the east-west (longitude coordinate)
 
 phi=[0:dphi:2.*pi-dphi]; % the longitude mesh 
-theta=dtheta./2-85.*pi./180:dtheta:85.*pi./180-dtheta./2; % the latitude mesh
+theta=dtheta./2-85.*pi./180:dtheta:85.*pi./180-dtheta./2; % the latitude mesh 
 if initial_winds==IDEALISED_JET
     %theta=dtheta./2+15.*pi./180:dtheta:85.*pi./180-dtheta./2; % the latitude mesh
     theta=dtheta./2+65.*pi./180:dtheta:86.5.*pi./180-dtheta./2; % the latitude mesh
+    %theta=dtheta./2+0.*pi./180:dtheta:86.5.*pi./180-dtheta./2; % the latitude mesh
 end
 %--------------------------------------------------------------------------
 
@@ -83,8 +84,9 @@ if restart == false
 
     switch initial_winds
         case IDEALISED_JET
-            u(:,:)=normpdf(THETA, 77.*pi./180,1.*pi./180);
-            u(:,:)=60.*u(:,:)./max(u(1,:));
+%            u(:,:)=normpdf(THETA, 77.*pi./180,1.*pi./180);    normal distribution 
+%            u(:,:)=120.*u(:,:)./max(u(1,:));
+            u(:,:)=100.*exp((-(20.*10.^-11).*((THETA-(77.*pi./180)).*5.4155760e7).^2./200)); % Gaussian jet (Juberias,2015) 
             v(:,:)=0.;
             max_wind = 2000;
             %%%%%%%
