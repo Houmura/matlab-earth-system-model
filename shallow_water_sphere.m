@@ -2,11 +2,10 @@
 % system. Paul Connolly, University of Manchester, September 2017
 
 % MODEL SETTINGS+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+FLAT_TOPO=1;
 IDEALISED_JET=2;
 EARTH_WINDS=3;
 NO_WINDS=4;
-
-FLAT_TOPO=1;
 %--------------------------------------------------------------------------
 
 % USER SETTINGS++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -29,7 +28,7 @@ vis=1e6; % turbulent dissipation coefficient
 
 dt_mins              = 1.;   % Timestep (minutes)
 output_interval_mins = 60;    % Time between outputs (minutes)
-forecast_length_days = 20;     % Total simulation length (days)
+forecast_length_days = 10;     % Total simulation length (days)
 
 % constants for Saturn
 g=10.44;       % gravity
@@ -43,6 +42,8 @@ scale_height=60e3; % scale height of earth's atmosphere (density and pressure fa
 
 % set-up of model grid
 
+top_latitude=86.5   % the top boundary of the latitude mesh for idealised jet condition [degree]
+bottom_latitude=65; % the bottom boundary of the latitude mesh for idealised jet condition [degree]
 dtheta=0.2.*pi./180;  % the north-south (latitude coordinate)
 dphi=1.*pi./180;    % the east-west (longitude coordinate)
 
@@ -50,7 +51,7 @@ phi=[0:dphi:2.*pi-dphi]; % the longitude mesh
 theta=dtheta./2-85.*pi./180:dtheta:85.*pi./180-dtheta./2; % the latitude mesh 
 if initial_winds==IDEALISED_JET
     %theta=dtheta./2+15.*pi./180:dtheta:85.*pi./180-dtheta./2; % the latitude mesh
-    theta=dtheta./2+65.*pi./180:dtheta:86.5.*pi./180-dtheta./2; % the latitude mesh
+    theta=dtheta./2+bottom_latitude.*pi./180:dtheta:top_latitude.*pi./180-dtheta./2; % the latitude mesh
     %theta=dtheta./2+0.*pi./180:dtheta:86.5.*pi./180-dtheta./2; % the latitude mesh
 end
 %--------------------------------------------------------------------------
