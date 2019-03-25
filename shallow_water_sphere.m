@@ -42,7 +42,7 @@ scale_height=60e3; % scale height of earth's atmosphere (density and pressure fa
 
 % set-up of model grid
 
-top_latitude=86.5   % the top boundary of the latitude mesh for idealised jet condition [degree]
+top_latitude=86.5;   % the top boundary of the latitude mesh for idealised jet condition [degree]
 bottom_latitude=65; % the bottom boundary of the latitude mesh for idealised jet condition [degree]
 dtheta=0.2.*pi./180;  % the north-south (latitude coordinate)
 dphi=1.*pi./180;    % the east-west (longitude coordinate)
