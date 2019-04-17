@@ -1,10 +1,10 @@
 % an example plotting program with m_map
-plot1='h';
+plot1='vort';
 print1='no';
 print_series=false;
-time_variable=false;
+time_variable=true;
 plot_latitude=77; %latitude of the peak [degree]
-plot_series_number=480; %the number of the plot you want to output
+plot_series_number=2400; %the number of the plot you want to output
 plot_series=false;
 
 figure('renderer','painters'); %maxfigsize
@@ -34,15 +34,17 @@ if time_variable == false
 				
 			case 'vort'
 				vorticity = zeros(size(u_save(:,:,1)));
-				vorticity(2:end-1,2:end-1) = (u_save(2:end-1,1:end-2,plot_series_number)-u_save(2:end-1,3:end,plot_series_number)) ...
-				+ (v_save(3:end,2:end-1,plot_series_number)-v_save(1:end-2,2:end-1,plot_series_number));
+				vorticity(2:end-1,2:end-1) = (u_save(2:end-1,1:end-2,plot_series_number)-u_save(2:end-1,3:end,plot_series_number))./(Re.*dtheta) ...
+				+ (v_save(3:end,2:end-1,plot_series_number)-v_save(1:end-2,2:end-1,plot_series_number))./(Re.*cos(theta(2:end-1)).*dphi);
 				
 				%periodic
-				vorticity(1,2:end-1) = (u_save(1,1:end-2,plot_series_number)-u_save(1,3:end,plot_series_number))+(v_save(2,2:end-1,plot_series_number)-v_save(end,2:end-1,plot_series_number));
-				vorticity(end,2:end-1) = (u_save(end,1:end-2,plot_series_number)-u_save(end,3:end,plot_series_number))+(v_save(1,2:end-1,plot_series_number)-v_save(end-1,2:end-1,plot_series_number));
+				vorticity(1,2:end-1) = (u_save(1,1:end-2,plot_series_number)-u_save(1,3:end,plot_series_number))./(Re.*dtheta)+ ...
+				(v_save(2,2:end-1,plot_series_number)-v_save(end,2:end-1,plot_series_number))./(Re.*cos(theta(1)).*dphi);
+				vorticity(end,2:end-1) = (u_save(end,1:end-2,plot_series_number)-u_save(end,3:end,plot_series_number))./(Re.*dtheta)+ ...
+				(v_save(1,2:end-1,plot_series_number)-v_save(end-1,2:end-1,plot_series_number))./(Re.*cos(theta(end)).*dphi);; 
 				F1=vorticity([lon/2+1:lon 1:lon/2],:);        
 				F1=[F1;F1(1,:)]; 
-				colorbar_name="Vorticity Field (s^{-1})"; 			
+				colorbar_name="Relative Vorticity Field (s^{-1})"; 			
             
 			case 'h'
 				F1=h_save([lon/2+1:lon 1:lon/2],:,plot_series_number);
@@ -93,15 +95,15 @@ if time_variable == false
 					
 				case 'vort'
 					vorticity = zeros(size(u_save(:,:,1)));
-					vorticity(2:end-1,2:end-1) = (u_save(2:end-1,1:end-2,i)-u_save(2:end-1,3:end,i)) ...
-					+ (v_save(3:end,2:end-1,i)-v_save(1:end-2,2:end-1,i));
+					vorticity(2:end-1,2:end-1) = (u_save(2:end-1,1:end-2,i)-u_save(2:end-1,3:end,i))./(Re.*dtheta) ...
+					+ (v_save(3:end,2:end-1,i)-v_save(1:end-2,2:end-1,i))./(Re.*cos(theta(2:end-1)).*dphi);
 					
 					%periodic
-					vorticity(1,2:end-1) = (u_save(1,1:end-2,i)-u_save(1,3:end,i))+(v_save(2,2:end-1,i)-v_save(end,2:end-1,i));
-					vorticity(end,2:end-1) = (u_save(end,1:end-2,i)-u_save(end,3:end,i))+(v_save(1,2:end-1,i)-v_save(end-1,2:end-1,i));
+					vorticity(1,2:end-1) = (u_save(1,1:end-2,i)-u_save(1,3:end,i))./(Re.*dtheta)+(v_save(2,2:end-1,i)-v_save(end,2:end-1,i))./(Re.*cos(theta(1)).*dphi);
+					vorticity(end,2:end-1) = (u_save(end,1:end-2,i)-u_save(end,3:end,i))./(Re.*dtheta)+(v_save(1,2:end-1,i)-v_save(end-1,2:end-1,i))./(Re.*cos(theta(end)).*dphi);;
 					F1=vorticity([lon/2+1:lon 1:lon/2],:);        
 					F1=[F1;F1(1,:)]; 
-					colorbar_name="Vorticity Field (s^{-1})"; 
+					colorbar_name="Relative Vorticity Field (s^{-1})"; 
 					
 				case 'h'
 					F1=h_save([lon/2+1:lon 1:lon/2],:,i);
@@ -124,6 +126,8 @@ if time_variable == false
 			object_colorbar = colorbar;    %return the Colorbar object and use this object to set properties after creating the colorbar
 			object_colorbar.Label.String = colorbar_name;
 			object_colorbar.Location = 'westoutside';
+                    
+            end
 	
 			%OUTPUT METHODS
 			if print_series == false
@@ -165,11 +169,11 @@ else
 	
 			for i=1:p
 				vorticity = zeros(size(u_save(:,:,1)));
-				vorticity(2:end-1,2:end-1) = (u_save(2:end-1,1:end-2,i)-u_save(2:end-1,3:end,i)) ...
-				+ (v_save(3:end,2:end-1,i)-v_save(1:end-2,2:end-1,i));
+				vorticity(2:end-1,2:end-1) = (u_save(2:end-1,1:end-2,i)-u_save(2:end-1,3:end,i))./(Re.*dtheta) ...
+				+ (v_save(3:end,2:end-1,i)-v_save(1:end-2,2:end-1,i))./(Re.*cos(theta(2:end-1)).*dphi);
 				%periodic
-				vorticity(1,2:end-1) = (u_save(1,1:end-2,i)-u_save(1,3:end,i))+(v_save(2,2:end-1,i)-v_save(end,2:end-1,i));
-				vorticity(end,2:end-1) = (u_save(end,1:end-2,i)-u_save(end,3:end,i))+(v_save(1,2:end-1,i)-v_save(end-1,2:end-1,i));
+				vorticity(1,2:end-1) = (u_save(1,1:end-2,i)-u_save(1,3:end,i))./(Re.*dtheta)+(v_save(2,2:end-1,i)-v_save(end,2:end-1,i))./(Re.*cos(theta(1)).*dphi);
+				vorticity(end,2:end-1) = (u_save(end,1:end-2,i)-u_save(end,3:end,i))./(Re.*dtheta)+(v_save(1,2:end-1,i)-v_save(end-1,2:end-1,i))./(Re.*cos(theta(end)).*dphi);
 				vorticity_save(:,:,i)=vorticity(:,:);          
 			end
 	
@@ -178,8 +182,8 @@ else
 			pcolor(vorticity_time(:,:,:));
 			shading flat;
 			colorbar;
-			colorbar_name="Vorticity Field (s^{-1})";
-			title({[char(strrep(colorbar_name,'Vorticity Field (s^{-1})','Vorticity Field ')),' at ',num2str(plot_latitude),'\circ N']});
+			colorbar_name="Relative Vorticity Field (s^{-1})";
+			title({[char(strrep(colorbar_name,'Relatice Vorticity Field (s^{-1})','Relative Vorticity Field ')),' at ',num2str(plot_latitude),'\circ N']});
 			xlabel('Longitude (\circ)');
 			ylabel('Hours');
 			xticks(0:60:360);
