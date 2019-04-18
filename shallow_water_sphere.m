@@ -28,15 +28,15 @@ vis=1e6; % turbulent dissipation coefficient
 
 dt_mins              = 1.;   % Timestep (minutes)
 output_interval_mins = 60;    % Time between outputs (minutes)
-forecast_length_days = 10;     % Total simulation length (days)
+forecast_length_days = 50;     % Total simulation length (days)
 
 % constants for Saturn
 g=10.44;       % gravity
 rho=.19;       % density [ in[kg/m^3] ]
 Re=5.4155760e7;     % radius of planet [m]
 f=2.*pi./((10.55).*3600); % radians per second - planet's rotation rate
-U_0=100;	% peak velocity of the jet [m/s]	
-C=20.*10.^-11;	% peak latitudinal curvature of the jet [m^-1s^-1]
+U_0=125;	% peak velocity of the jet [m/s]	
+Curvature=20.*10.^-11;	% peak latitudinal curvature of the jet [m^-1s^-1]
 
 scale_height=60e3; % scale height of earth's atmosphere (density and pressure fall by 1/e)
 
@@ -86,9 +86,8 @@ if restart == false
 
     switch initial_winds
         case IDEALISED_JET
-%            u(:,:)=normpdf(THETA, 77.*pi./180,1.*pi./180);    normal distribution 
-%            u(:,:)=120.*u(:,:)./max(u(1,:));
-	    u(:,:)=U_0.*exp((-C.*((THETA-(77.*pi./180)).*Re).^2./200)); % Gaussian jet (Juberias,2015) 
+			C=sqrt(2.*U_0./Curvature)
+			u(:,:)=U_0.*exp(-((THETA-(77.*pi./180)).*Re)^2./C.^2)
             v(:,:)=0.;
             max_wind = 2000;
             %%%%%%%
