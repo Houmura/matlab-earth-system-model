@@ -127,7 +127,6 @@ if time_variable == false
 			object_colorbar.Label.String = colorbar_name;
 			object_colorbar.Location = 'westoutside';
                     
-            end
 	
 			%OUTPUT METHODS
 			if print_series == false
