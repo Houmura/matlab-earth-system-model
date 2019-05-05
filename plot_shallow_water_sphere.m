@@ -1,198 +1,40 @@
-% an example plotting program with m_map
-plot1='vort';
-print1='no';
+% a plotting program with m_map
+
+% OUTPUT SETTING
+contour_plotting=false;
+variable_T_plotting=false;
+map_plotting=true;
+plot1='u';
 print_series=false;
-time_variable=true;
-plot_latitude=77; %latitude of the peak [degree]
-plot_series_number=2400; %the number of the plot you want to output
+
+
+
+plot_latitude=77; %the latitude you want to extract from the data[degree]
+plot_series_number=5; %index (time) of the fields you focus, ignore this if time_variable OR plot_series==true
 plot_series=false;
+bottom_latitude=65;
 
-figure('renderer','painters'); %maxfigsize
-if viscous_dissipation == false
-    vis=0.;
-end
-warning off;
-[r,c,p]=size(u_save);
-lon=length(phi);
 
-if time_variable == false
+if map_plotting==true
 	if plot_series == false
-		phi2=[0:dphi:2.*pi];
-		m_proj('stereographic','lat',90,'lon',0,'radius',25)
-		hold off;
-		
-		switch plot1
-			case 'u'
-				F1=u_save([lon/2+1:lon 1:lon/2],:,plot_series_number);
-				F1=[F1;F1(1,:)];    %periodic 
-				colorbar_name="U Wind-Field (m/s)"; 
-								
-			case 'v'
-				F1=v_save([lon/2+1:lon 1:lon/2],:,plot_series_number);
-				F1=[F1;F1(1,:)];    %periodic 
-				colorbar_name="V Wind-Field (m/s)";
-				
-			case 'vort'
-				vorticity = zeros(size(u_save(:,:,1)));
-				vorticity(2:end-1,2:end-1) = (u_save(2:end-1,1:end-2,plot_series_number)-u_save(2:end-1,3:end,plot_series_number))./(Re.*dtheta) ...
-				+ (v_save(3:end,2:end-1,plot_series_number)-v_save(1:end-2,2:end-1,plot_series_number))./(Re.*cos(theta(2:end-1)).*dphi);
-				
-				%periodic
-				vorticity(1,2:end-1) = (u_save(1,1:end-2,plot_series_number)-u_save(1,3:end,plot_series_number))./(Re.*dtheta)+ ...
-				(v_save(2,2:end-1,plot_series_number)-v_save(end,2:end-1,plot_series_number))./(Re.*cos(theta(1)).*dphi);
-				vorticity(end,2:end-1) = (u_save(end,1:end-2,plot_series_number)-u_save(end,3:end,plot_series_number))./(Re.*dtheta)+ ...
-				(v_save(1,2:end-1,plot_series_number)-v_save(end-1,2:end-1,plot_series_number))./(Re.*cos(theta(end)).*dphi);; 
-				F1=vorticity([lon/2+1:lon 1:lon/2],:);        
-				F1=[F1;F1(1,:)]; 
-				colorbar_name="Relative Vorticity Field (s^{-1})"; 			
-            
-			case 'h'
-				F1=h_save([lon/2+1:lon 1:lon/2],:,plot_series_number);
-				F1=[F1;F1(1,:)];    %periodic 
-				colorbar_name="Height Field (m)";
- 				
-			otherwise
-				disp(['error ']);
-				return;
-	
-		end
-	
-		m_pcolor(phi2.*180./pi,theta.*180./pi,F1');shading flat
-		m_grid('fontsize',8,'xticklabels',[-150:30:180],'xtick',[-150:30:180],... 
-				'ytick',[70 75 80 85],'yticklabels',[70 75 80 85],'linest',':','color',[0 0 0],'linewidth',0.1);
-		title({[colorbar_name];['Time (hrs): ',num2str(t_save(plot_series_number)./3600)];[num2str(plot_series_number),' of ',num2str(p),'; viscosity: ',num2str(vis)];[]});
-		object_colorbar = colorbar;    %return the Colorbar object and use this object to set properties after creating the colorbar
-		object_colorbar.Label.String = colorbar_name;
-		object_colorbar.Location = 'westoutside';
-	
-		%OUTPUT METHODS
-		if print_series == true
-			saveas(gcf,[num2str(i),'.jpg'],'jpeg')
-			hold off
-		
-		end
-		
+		run('map_plot.m')	
 	else
-		for i=1:p 
-			phi2=[0:dphi:2.*pi];
-			%phi2=[phi2(lon/2+1:lon),phi2(1:lon/2),phi2(end)];
-			%PHI2=[PHI(lon/2+1:lon,:)-360.*pi./180; PHI(1:lon/2,:)];
-			%m_proj('robinson','long',[-180 180],'lat',[-90 90]);
-			m_proj('stereographic','lat',90,'lon',0,'radius',25)
-			%m_proj('ortho','long',180,'lat',60);
-			hold off;
-			
-			switch plot1
-				case 'u'
-					F1=u_save([lon/2+1:lon 1:lon/2],:,i);
-					F1=[F1;F1(1,:)];    %periodic 
-					colorbar_name="U Wind-Field (m/s)"; 
-
-				case 'v'
-					F1=v_save([lon/2+1:lon 1:lon/2],:,i);
-					F1=[F1;F1(1,:)];    %periodic 
-					colorbar_name="V Wind-Field (m/s)";
-					
-				case 'vort'
-					vorticity = zeros(size(u_save(:,:,1)));
-					vorticity(2:end-1,2:end-1) = (u_save(2:end-1,1:end-2,i)-u_save(2:end-1,3:end,i))./(Re.*dtheta) ...
-					+ (v_save(3:end,2:end-1,i)-v_save(1:end-2,2:end-1,i))./(Re.*cos(theta(2:end-1)).*dphi);
-					
-					%periodic
-					vorticity(1,2:end-1) = (u_save(1,1:end-2,i)-u_save(1,3:end,i))./(Re.*dtheta)+(v_save(2,2:end-1,i)-v_save(end,2:end-1,i))./(Re.*cos(theta(1)).*dphi);
-					vorticity(end,2:end-1) = (u_save(end,1:end-2,i)-u_save(end,3:end,i))./(Re.*dtheta)+(v_save(1,2:end-1,i)-v_save(end-1,2:end-1,i))./(Re.*cos(theta(end)).*dphi);;
-					F1=vorticity([lon/2+1:lon 1:lon/2],:);        
-					F1=[F1;F1(1,:)]; 
-					colorbar_name="Relative Vorticity Field (s^{-1})"; 
-					
-				case 'h'
-					F1=h_save([lon/2+1:lon 1:lon/2],:,i);
-					F1=[F1;F1(1,:)];    %periodic 
-					colorbar_name="Height Field (m)";
-					
-				otherwise
-					disp(['error ']);
-					return;
-		
-			end
-		
-		%m_gshhs_c('color','k');
-		%m_quiver(PHI2(1:3:end,1:3:end)'.*180./pi,THETA(1:3:end,1:3:end)'.*180./pi,...
-        %u_save([91:3:180 1:3:90],1:3:end,i)',v_save([91:3:180 1:3:90],1:3:end,i)')
-			m_pcolor(phi2.*180./pi,theta.*180./pi,F1');shading flat
-			m_grid('fontsize',8,'xticklabels',[-150:30:180],'xtick',[-150:30:180],... 
-					'ytick',[70 75 80 85],'yticklabels',[70 75 80 85],'linest',':','color',[0 0 0],'linewidth',0.1);
-			title({[colorbar_name];['Time (hrs): ',num2str(t_save(i)./3600)];[num2str(i),' of ',num2str(p),'; viscosity: ',num2str(vis)];[]});
-			object_colorbar = colorbar;    %return the Colorbar object and use this object to set properties after creating the colorbar
-			object_colorbar.Label.String = colorbar_name;
-			object_colorbar.Location = 'westoutside';
-                    
-	
-			%OUTPUT METHODS
-			if print_series == false
-				pause; %(0.1);
-				
-			else
-				saveas(gcf,[num2str(i),'.jpg'],'jpeg')
-				hold off
-				
-			end
-			
+		for plot_series_number=1:p 
+            run('map_plot.m')	
 		end    
-			
-		if strcmp(print1,'yes')
-			eval(['print -dpng -r25 aframe',num2str(i,'%03d'),'.png']);
-		end
 	end	
-else
-	phi2=[phi(lon/2+1:lon)-360.*pi./180 phi(1:lon/2)];
-	PHI2=[PHI(lon/2+1:lon,:)-360.*pi./180; PHI(1:lon/2,:)];
+end
 
-	switch plot1
-		case 'h'
-			h_time=h_save([lon/2+1:lon 1:lon/2],(plot_latitude-bottom_latitude)/(dtheta/(pi/180)),:);   %extract height data at the latitude 
-			h_time=permute(h_time,[3,1,2]);
-			pcolor(h_time(:,:,:));
-			shading flat;
-			colorbar;
-			colorbar_name="Height Field (m)";
-			title({[char(strrep(colorbar_name,'Height Field (m)','Height Field ')),' at ',num2str(plot_latitude),'\circ N']});
-			xlabel('Longitude (\circ)');
-			ylabel('Hours');
-			xticks(0:60:360);
-			xlim([0 360]);				ylim([0 p]);
-			
-		case 'vort'
-			vorticity = zeros(size(u_save(:,:,1)));
-			vorticity_save=zeros([size(vorticity),p]);
-	
-			for i=1:p
-				vorticity = zeros(size(u_save(:,:,1)));
-				vorticity(2:end-1,2:end-1) = (u_save(2:end-1,1:end-2,i)-u_save(2:end-1,3:end,i))./(Re.*dtheta) ...
-				+ (v_save(3:end,2:end-1,i)-v_save(1:end-2,2:end-1,i))./(Re.*cos(theta(2:end-1)).*dphi);
-				%periodic
-				vorticity(1,2:end-1) = (u_save(1,1:end-2,i)-u_save(1,3:end,i))./(Re.*dtheta)+(v_save(2,2:end-1,i)-v_save(end,2:end-1,i))./(Re.*cos(theta(1)).*dphi);
-				vorticity(end,2:end-1) = (u_save(end,1:end-2,i)-u_save(end,3:end,i))./(Re.*dtheta)+(v_save(1,2:end-1,i)-v_save(end-1,2:end-1,i))./(Re.*cos(theta(end)).*dphi);
-				vorticity_save(:,:,i)=vorticity(:,:);          
-			end
-	
-			vorticity_time=vorticity_save([lon/2+1:lon 1:lon/2],(plot_latitude-bottom_latitude)/(dtheta/(pi/180)),:);   %extract height data at the latitude 
-			vorticity_time=permute(vorticity_time,[3,1,2]);
-			pcolor(vorticity_time(:,:,:));
-			shading flat;
-			colorbar;
-			colorbar_name="Relative Vorticity Field (s^{-1})";
-			title({[char(strrep(colorbar_name,'Relatice Vorticity Field (s^{-1})','Relative Vorticity Field ')),' at ',num2str(plot_latitude),'\circ N']});
-			xlabel('Longitude (\circ)');
-			ylabel('Hours');
-			xticks(0:60:360);
-			xlim([0 360]);
-			ylim([0 p]);
-		otherwise
-			disp(['error ']);
-			return;	
-	
-	end
-	object_colorbar = colorbar;    %return the Colorbar object and use this object to set properties after creating the colorbar		object_colorbar.Label.String = colorbar_name;
-	
+if contour_plotting == true
+	if plot_series == false
+		run('contour_plot.m')	
+	else
+		for plot_series_number=1:p 
+            run('contou r_plot.m')	
+		end    
+	end	
+end
+
+if variable_T_plotting==true
+	run('variable_T_plot.m')
 end
